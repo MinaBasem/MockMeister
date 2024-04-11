@@ -1,4 +1,4 @@
-# MockMeister
+# MockMeister - _Your data generation companion_
 MockMeister is a GUI mock (fake) data generation software written in Python.
 
 ### Features
