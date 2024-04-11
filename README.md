@@ -18,9 +18,9 @@ MockMeister is a GUI mock (fake) data generation software written in Python.
 ### Prerequisites:
 
 - Python 3.x
-- PyQt5 library (installation: pip install PyQt5)
-- requests library (installation: pip install requests)
-- pandas library (installation: pip install pandas)
+- PyQt5 library (installation: `pip install PyQt5`)
+- requests library (installation: `pip install requests`)
+- pandas library (installation: `pip install pandas`)
   
 Clone or Download the Repository:
 Use Git to clone the repository or download the code files directly.
