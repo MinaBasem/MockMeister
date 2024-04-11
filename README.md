@@ -5,11 +5,11 @@ MockMeister is a GUI mock (fake) data generation software written in Python.
 
 <img align="right" width="460" height="250" src="https://github.com/MinaBasem/MockMeister/assets/42482261/ab129d98-38ec-4adc-8659-00b63797f6a9">
 
-- Interactive Interface: User-friendly buttons and visual elements enhance the experience.
-- Specifying Data Fields: Select the desired data points from a pre-defined list (e.g., first name, email address, phone number, address components).
-- Setting Row Count: Determine the number of data rows to be generated.
-- Generating Data: Initiate the data generation process using the API and populate the table.
-- Data Export (Potential Future Enhancement): Explore implementing functionality to export generated data to CSV or other formats.
+- **Interactive Interface:** User-friendly buttons and visual elements enhance the experience.
+- **Specifying Data Fields:** Select the desired data points from a pre-defined list (e.g., first name, email address, phone number, address components).
+- **Setting Row Count:** Determine the number of data rows to be generated.
+- **Generating Data:** Initiate the data generation process using the API and populate the table.
+- **Data Export (Potential Future Enhancement):** Explore implementing functionality to export generated data to CSV or other formats.
 
 
 # Getting Started
