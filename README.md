@@ -39,8 +39,6 @@ The application leverages the requests library to fetch data from a random data 
 
 ### Future Enhancements
 
-- **Data Export**: Allow exporting the generated data to a file format like CSV or JSON for further analysis or storage.
-- **Data Filtering/Sorting**: Implement functionalities to search, filter, or sort the generated data within the table.
 - **Data Validation**: Consider adding validation checks to ensure consistency and accuracy of the generated data, especially for specific fields or formats.
 - **Advanced Data Generation**: Explore integrating with a more capable random data API that offers greater control over data types, ranges, and distributions.
 
