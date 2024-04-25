@@ -1,9 +1,7 @@
-import requests
-import json
 import pandas as pd
 import datetime
 import random
-from pandas import json_normalize
+import os
 from PyQt5.QtCore import (Qt, QSize, QUrl)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
@@ -27,15 +25,18 @@ from PyQt5.QtWidgets import (
 )
 
 from misc.messages import help_text # type: ignore
+from data import DataGeneration, DataTransformation # type: ignore
 
 class MainWindow(QMainWindow):
     def __init__(self):
+
+        self.data_generation, self.data_transformation = DataGeneration(), DataTransformation()
+
         self.dataframe = pd.DataFrame()
         super(MainWindow, self).__init__()
-        self.setWindowTitle("MockMeister v1.1")
+        self.setWindowTitle("MockMeister v1.2")
         self.setFixedSize(800, 500)
-        icon = QIcon("misc/mockmeister_simple_logo.png")
-        self.setWindowIcon(icon)
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "misc", "mockmeister_simple_logo.png")))
 
         toolbar = QToolBar("Toolbar")
         toolbar.setIconSize(QSize(16, 16))
@@ -78,14 +79,24 @@ class MainWindow(QMainWindow):
         self.list_widget.setDragDropMode(QAbstractItemView.InternalMove)
 
         self.combo_box = QComboBox()
-        self.combo_box.addItems(["first_name", "last_name", "email", "phone_number", "address.city", "address.street_name", "address.street_address", "address.zip_code", "address.state", "address.country", "employment.title", "Years of experience", "Salary"])
-        #combo_box.setFixedWidth(50)
+        self.fields = {      # key is API name, value is display name
+            "first_name": "First Name", 
+            "last_name": "Last Name", 
+            "email": "Email", 
+            "address.city": "City", 
+            "address.street_name": "Street Name", 
+            "address.street_address": "Street Address",
+            "address.zip_code": "Zip Code", 
+            "address.state": "State", 
+            "address.country": "Country", 
+            "employment.title": "Title", 
+            "years_of_experience": "Years of experience"}
+        self.combo_box.addItems(self.fields.values())
+
 
         self.table = QTableWidget()
         self.table.setRowCount(15)                   # Set row count based on data
         self.table.setColumnCount(6)                 # Set column count based on data keys
-        #self.table.setHorizontalHeaderLabels(list(data.keys()))     # Set column headers
-
 
         self.table.verticalHeader().setVisible(False)
         self.table.setFixedWidth(620)
@@ -98,7 +109,7 @@ class MainWindow(QMainWindow):
 
         self.generate_button = QPushButton("Generate")
         self.generate_button.setEnabled(False)
-        self.generate_button.clicked.connect(self.generate_table)
+        self.generate_button.clicked.connect(self.generate_table_in_UI)
         add_button = QPushButton("+")
         add_button.setFixedWidth(20)
         add_button.clicked.connect(self.add_button_func)
@@ -126,6 +137,14 @@ class MainWindow(QMainWindow):
         widget.setLayout(V_layout)
         self.setCentralWidget(widget)
 
+    
+    def display_message_box(self, title, message):
+        message_box = QMessageBox(self)
+        message_box.setWindowTitle(title)
+        message_box.setText(message)
+        #message_box.setIcon(QMessageBox.Icon.icon)
+        message_box.exec()
+
 
     def add_button_func(self):
         self.generate_button.setEnabled(True)
@@ -150,57 +169,22 @@ class MainWindow(QMainWindow):
         value = self.counter_widget.value()
         return value
     
-    def get_all_items(self):
+    def get_requested_fields(self):        # Returns data selected in the list box
         items = []
         for row in range(self.list_widget.count()):
-            item = self.list_widget.item(row)
-            items.append(item.text())  # Append the text of each item to the list
+            display_name = self.list_widget.item(row).text()
+            # Lookup the key based on the display name
+            key = next(key for key, value in self.fields.items() if value == display_name)
+            items.append(key)
         return items
 
-    def generate_data(self):
-        count = self.get_spinbox_value()
-        random_data_generator_url = "https://random-data-api.com/api/v2/users?size=" + str(count) + "&is_xml=true"
-        response = requests.get(random_data_generator_url)
-        data = json.loads(response.text)
-        df = json_normalize(data)
-        needed_data = self.get_all_items()
 
-        df = self.transform_data(df, needed_data)
-
-        self.dataframe = df[needed_data]
-        print(self.dataframe)
-        return self.dataframe
-    
-    def transform_data(self, df, needed_data):
-        if 'email' in needed_data:
-            domain_options = ['@gmail', '@yahoo', '@hotmail']
-            def replace_email(email):
-                return email.replace('@email', random.choice(domain_options))
-            df['email'] = df['email'].apply(replace_email)
-
-            separator_options = ['_', '.']
-            def replace_separator(email):
-                return email.replace('.', random.choice(separator_options), 1)
-            df['email'] = df['email'].apply(replace_separator)
-
-            def add_random_number_to_email(email):
-                add_or_not = random.choice([0, 1])
-                if add_or_not == 0:
-                    return email
-                else:
-                    random_number_str = str(random.randint(0, 9999)).zfill(4)
-                    email_parts = email.split('@')
-                    modified_username = email_parts[0] + "_" + random_number_str
-                    return modified_username + "@" + email_parts[1]
-            df['email'] = df['email'].apply(add_random_number_to_email)
-
-        return df
-
-
-    def generate_table(self):           
+    def generate_table_in_UI(self):
+        
         try:
-            new_data = self.generate_data()
-            #self.save_file(new_data)
+            row_count = self.get_spinbox_value()
+            requested_fields = self.get_requested_fields()
+            new_data = self.data_generation.generate_data(row_count, requested_fields)
 
             self.table.clearContents()          # Clear the existing table
             self.table.setRowCount(0)
@@ -219,18 +203,20 @@ class MainWindow(QMainWindow):
                     item = QTableWidgetItem(str(value))  # Convert value to string for display
                     self.table.setItem(row, col, item)
 
+            self.dataframe = new_data
+            return new_data
+
         except:
-            message_box = QMessageBox(self)     # Shows python3 in title, fix it
-            message_box.setText("Error calling API and generating table. \nPlease retry.")
-            message_box.setIcon(QMessageBox.Icon.Warning)
-            message_box.exec()
+            self.display_message_box("Error", "Error calling API and generating table. \nPlease retry.")
 
 
     def save_file(self):
         now = datetime.datetime.now()
         formatted_datetime = now.strftime("%d-%m-%Y-%H-%M-%S")
-        self.dataframe.to_csv("data-" + formatted_datetime + ".csv", index=False)
-        print("Data saved to location")
+        file_path = os.path.join(os.path.dirname(__file__), "saves", "data-" + formatted_datetime + ".csv")
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        self.dataframe.to_csv(file_path, index=False)
+        print("Data saved to:", file_path)
 
     def open_file(self):
         options = QFileDialog.Options()

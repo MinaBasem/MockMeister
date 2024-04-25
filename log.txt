@@ -1,0 +1,8 @@
+Version 1.2
+
+- Emails are now more random with probabilities
+- Separated data related functions to data.py
+- Fixed a bug where files were saved at the parent directory instead of the 'saves' directory
+- More readable field names in dropdown list
+
+Bug: issue when only 1 column (except email) is requested
