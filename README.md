@@ -9,7 +9,7 @@ MockMeister is a GUI mock (fake) data generation software written in Python.
 - **Specifying Data Fields:** Select the desired data points from a pre-defined list (e.g., first name, email address, phone number, address components).
 - **Setting Row Count:** Determine the number of data rows to be generated.
 - **Generating Data:** Initiate the data generation process using the API and populate the table.
-- **Data Export (Potential Future Enhancement):** Explore implementing functionality to export generated data to CSV or other formats.
+- **Data Export:** Export generated data to CSV.
 
 
 # Getting Started
@@ -35,12 +35,12 @@ python main.py
 
 ### Technical Overview
 
-The application leverages the requests library to fetch data from a random data API. The retrieved JSON response is parsed using pandas to create a DataFrame. User-selected data fields are then extracted and used to populate a PyQt5 QTableWidget for visual representation.
+The application leverages the requests library to fetch data from <href>https://random-data-api.com</href>'s API. The retrieved JSON response is parsed using pandas to create a DataFrame. User-selected data fields are then extracted and used to populate a table for visual representation.
 
 ### Future Enhancements
 
-- **Data Validation**: Consider adding validation checks to ensure consistency and accuracy of the generated data, especially for specific fields or formats.
-- **Advanced Data Generation**: Explore integrating with a more capable random data API that offers greater control over data types, ranges, and distributions.
+- **Data Validation**: Ensure consistency and accuracy of the generated data, especially for specific fields or formats.
+- **Advanced Data Generation**: Integrating more capable random data generation algorithms to offer greater control over data types, ranges, and distributions.
 
 ### Contribution
 
